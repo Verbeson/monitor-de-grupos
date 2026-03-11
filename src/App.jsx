@@ -8,32 +8,32 @@ const PLANS = [
     desc: "Para experimentar sem compromisso",
     features: [
       "1 conta do WhatsApp",
-      "Notificacoes basicas",
-      "Ate 3 grupos monitorados",
+      "Notificações básicas",
+      "Até 3 grupos monitorados",
       "Suporte por email",
     ],
-    cta: "Instalar gratis",
+    cta: "Instalar grátis",
     highlight: false,
   },
   {
     name: "Pro",
     price: "R$ 19,90",
-    period: "/mes",
-    desc: "Para quem nao pode perder nada",
+    period: "/mês",
+    desc: "Para quem não pode perder nada",
     features: [
-      "Ate 3 contas do WhatsApp",
+      "Até 3 contas do WhatsApp",
       "Filtros por grupo e contato",
       "Alertas sonoros personalizados",
       "Grupos ilimitados monitorados",
-      "Suporte prioritario",
+      "Suporte prioritário",
     ],
-    cta: "Comecar agora",
+    cta: "Começar agora",
     highlight: true,
   },
   {
     name: "Business",
     price: "R$ 39,90",
-    period: "/mes",
+    period: "/mês",
     desc: "Para times e empresas",
     features: [
       "Contas ilimitadas",
@@ -56,27 +56,27 @@ const FEATURES = [
   {
     icon: "◈",
     title: "Alertas sonoros",
-    desc: "Sons diferentes por conversa. Voce sabe o que chegou antes de olhar.",
+    desc: "Sons diferentes por conversa. Você sabe o que chegou antes de olhar.",
   },
   {
     icon: "⬡",
-    title: "Multiplas contas",
-    desc: "Pessoal e trabalho no mesmo lugar. Sem abrir varias janelas.",
+    title: "Múltiplas contas",
+    desc: "Pessoal e trabalho no mesmo lugar. Sem abrir várias janelas.",
   },
   {
     icon: "◇",
     title: "Filtros inteligentes",
-    desc: "Bloqueie numeros irrelevantes. Seu foco e seu.",
+    desc: "Bloqueie números irrelevantes. Seu foco é seu.",
   },
   {
     icon: "○",
     title: "Privacidade total",
-    desc: "Seus dados ficam no seu navegador. Nao coletamos nada.",
+    desc: "Seus dados ficam no seu navegador. Não coletamos nada.",
   },
   {
     icon: "◻",
-    title: "Popup instantaneo",
-    desc: "Notificacao aparece onde voce esta. Sem trocar de aba.",
+    title: "Popup instantâneo",
+    desc: "Notificação aparece onde você está. Sem trocar de aba.",
   },
 ];
 
@@ -270,11 +270,11 @@ export default function App() {
         </div>
         <div style={{ display: "flex", gap: 32 }}>
           <a href="#recursos">Recursos</a>
-          <a href="#precos">Precos</a>
+          <a href="#precos">Preços</a>
           <a href="#faq">FAQ</a>
         </div>
         <button className="btn-primary" style={{ padding: "10px 24px", fontSize: 12 }}>
-          Instalar gratis
+          Instalar grátis
         </button>
       </nav>
 
@@ -308,14 +308,14 @@ export default function App() {
             maxWidth: 520, margin: "0 auto 48px",
           }}>
             Monitore grupos do WhatsApp Web com filtros precisos e alertas sonoros.
-            So o que voce definiu chega ate voce.
+            Só o que você definiu chega até você.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="btn-primary">Instalar gratis</button>
+            <button className="btn-primary">Instalar grátis</button>
             <button className="btn-ghost">Ver planos</button>
           </div>
           <p style={{ marginTop: 20, fontSize: 12, color: "rgba(232,237,242,0.3)", letterSpacing: "0.05em" }}>
-            SEM CARTAO DE CREDITO &nbsp;·&nbsp; INSTALA EM 30 SEGUNDOS
+            SEM CARTÃO DE CRÉDITO &nbsp;·&nbsp; INSTALA EM 30 SEGUNDOS
           </p>
         </div>
 
@@ -395,7 +395,7 @@ export default function App() {
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <FadeIn>
             <div style={{ textAlign: "center", marginBottom: 48 }}>
-              <span className="pill" style={{ marginBottom: 16, display: "inline-block" }}>Precos</span>
+              <span className="pill" style={{ marginBottom: 16, display: "inline-block" }}>Preços</span>
               <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 32 }}>
                 Simples e transparente
               </h2>
@@ -453,13 +453,13 @@ export default function App() {
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <span className="pill" style={{ marginBottom: 16, display: "inline-block" }}>FAQ</span>
             <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 800, letterSpacing: "-0.02em" }}>
-              Duvidas frequentes
+              Dúvidas frequentes
             </h2>
           </div>
         </FadeIn>
         {[
-          { q: "Precisa deixar o WhatsApp Web aberto?", a: "Sim. A extensao le as notificacoes em tempo real do WhatsApp Web. A aba pode estar em segundo plano, mas precisa estar aberta." },
-          { q: "Meus dados sao coletados?", a: "Nao. Tudo processa localmente no seu navegador. Nenhuma mensagem ou dado e enviado para nossos servidores." },
+          { q: "Precisa deixar o WhatsApp Web aberto?", a: "Sim. A extensão lê as notificações em tempo real do WhatsApp Web. A aba pode estar em segundo plano, mas precisa estar aberta." },
+          { q: "Meus dados são coletados?", a: "Não. Tudo processa localmente no seu navegador. Nenhuma mensagem ou dado é enviado para nossos servidores." },
           { q: "Funciona com WhatsApp Business?", a: "Sim, funciona com contas pessoais e Business no WhatsApp Web." },
           { q: "Posso cancelar a qualquer momento?", a: "Sim. Sem multa, sem burocracia. Cancele direto pelo painel a qualquer hora." },
         ].map((item, i) => (
@@ -485,10 +485,10 @@ export default function App() {
               Pronto para ter<br /><span style={{ color: "#25f572" }}>foco de verdade?</span>
             </h2>
             <p style={{ color: "rgba(232,237,242,0.45)", fontSize: 15, marginBottom: 36 }}>
-              Instale gratis e configure em menos de 2 minutos.
+              Instale grátis e configure em menos de 2 minutos.
             </p>
             <button className="btn-primary" style={{ fontSize: 14, padding: "16px 40px" }}>
-              Adicionar ao Chrome — gratis
+              Adicionar ao Chrome — grátis
             </button>
           </div>
         </FadeIn>
@@ -500,7 +500,7 @@ export default function App() {
           Monitor<span style={{ color: "#25f572" }}>.</span>
         </div>
         <div style={{ fontSize: 11, color: "rgba(232,237,242,0.25)", letterSpacing: "0.05em" }}>
-          Extensao nao oficial. Sem vinculo com WhatsApp LLC ou Meta.
+          Extensão não oficial. Sem vínculo com WhatsApp LLC ou Meta.
         </div>
         <div style={{ display: "flex", gap: 20 }}>
           <a href="#" style={{ fontSize: 12, color: "rgba(232,237,242,0.35)", textDecoration: "none" }}>Privacidade</a>
