@@ -273,9 +273,9 @@ export default function App() {
           <a href="#precos">Preços</a>
           <a href="#faq">FAQ</a>
         </div>
-        <button className="btn-primary" style={{ padding: "10px 24px", fontSize: 12 }}>
-          Instalar grátis
-        </button>
+        <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ padding: "10px 24px", fontSize: 12, textDecoration: "none" }}>
+          Baixar grátis
+        </a>
       </nav>
 
       {/* HERO */}
@@ -311,8 +311,8 @@ export default function App() {
             Só o que você definiu chega até você.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="btn-primary">Instalar grátis</button>
-            <button className="btn-ghost">Ver planos</button>
+            <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ textDecoration: "none" }}>Baixar extensão grátis</a>
+            <a href="#precos" className="btn-ghost" style={{ textDecoration: "none" }}>Ver planos</a>
           </div>
           <p style={{ marginTop: 20, fontSize: 12, color: "rgba(232,237,242,0.3)", letterSpacing: "0.05em" }}>
             SEM CARTÃO DE CRÉDITO &nbsp;·&nbsp; INSTALA EM 30 SEGUNDOS
@@ -487,9 +487,9 @@ export default function App() {
             <p style={{ color: "rgba(232,237,242,0.45)", fontSize: 15, marginBottom: 36 }}>
               Instale grátis e configure em menos de 2 minutos.
             </p>
-            <button className="btn-primary" style={{ fontSize: 14, padding: "16px 40px" }}>
-              Adicionar ao Chrome — grátis
-            </button>
+            <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ fontSize: 14, padding: "16px 40px", textDecoration: "none", display: "inline-block" }}>
+              Baixar extensão — grátis
+            </a>
           </div>
         </FadeIn>
       </section>
