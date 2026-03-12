@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+const MP_SUBSCRIBE_URL = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=df6fffef0b634a13b94f51ed1fbf4199";
+
 const PLANS = [
   {
     name: "Free",
@@ -7,13 +9,14 @@ const PLANS = [
     period: "",
     desc: "Para experimentar sem compromisso",
     features: [
-      "1 conta do WhatsApp",
-      "Notificações básicas",
-      "Até 3 grupos monitorados",
-      "Suporte por email",
+      "1 grupo monitorado",
+      "1 contato ignorado",
+      "1 palavra ignorada",
+      "Alertas com som",
     ],
     cta: "Instalar grátis",
     highlight: false,
+    link: null,
   },
   {
     name: "Pro",
@@ -21,29 +24,15 @@ const PLANS = [
     period: "/mês",
     desc: "Para quem não pode perder nada",
     features: [
-      "Até 3 contas do WhatsApp",
-      "Filtros por grupo e contato",
-      "Alertas sonoros personalizados",
-      "Grupos ilimitados monitorados",
+      "Grupos ilimitados",
+      "Contatos ignorados ilimitados",
+      "Palavras ignoradas ilimitadas",
+      "Alertas com som",
       "Suporte prioritário",
     ],
-    cta: "Começar agora",
+    cta: "Assinar agora",
     highlight: true,
-  },
-  {
-    name: "Business",
-    price: "R$ 39,90",
-    period: "/mês",
-    desc: "Para times e empresas",
-    features: [
-      "Contas ilimitadas",
-      "Tudo do Pro",
-      "Contatos para ignorar",
-      "Dashboard de atividade",
-      "Suporte dedicado",
-    ],
-    cta: "Falar com vendas",
-    highlight: false,
+    link: MP_SUBSCRIBE_URL,
   },
 ];
 
@@ -437,9 +426,15 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                  <button className={plan.highlight ? "btn-primary" : "btn-ghost"} style={{ width: "100%" }}>
-                    {plan.cta}
-                  </button>
+                  {plan.link ? (
+                    <a href={plan.link} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
+                      {plan.cta}
+                    </a>
+                  ) : (
+                    <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-ghost" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
+                      {plan.cta}
+                    </a>
+                  )}
                 </div>
               </FadeIn>
             ))}
