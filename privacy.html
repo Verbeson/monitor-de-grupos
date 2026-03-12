@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politica de Privacidade - Monitor de Grupos WhatsApp</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #080c10;
+      color: #e8edf2;
+      line-height: 1.7;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #25f572;
+    }
+    .updated {
+      font-size: 13px;
+      color: rgba(232,237,242,0.4);
+      margin-bottom: 32px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      color: #e8edf2;
+    }
+    p, li {
+      font-size: 14px;
+      color: rgba(232,237,242,0.7);
+      margin-bottom: 12px;
+    }
+    ul {
+      padding-left: 24px;
+      margin-bottom: 12px;
+    }
+    li { margin-bottom: 6px; }
+    a { color: #25f572; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #25f572;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(232,237,242,0.1);
+      font-size: 12px;
+      color: rgba(232,237,242,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="/monitor-de-grupos/">&larr; Voltar ao inicio</a>
+
+    <h1>Politica de Privacidade</h1>
+    <p class="updated">Ultima atualizacao: 12 de marco de 2026</p>
+
+    <p>Esta politica de privacidade descreve como a extensao <strong>Monitor de Grupos WhatsApp</strong> ("Extensao") trata os dados dos usuarios.</p>
+
+    <h2>1. Coleta de Dados</h2>
+    <p>A Extensao <strong>nao coleta, armazena ou transmite</strong> nenhum dado pessoal, mensagens ou conteudo de conversas para servidores externos. Todo o processamento ocorre <strong>localmente no navegador</strong> do usuario.</p>
+
+    <h2>2. Dados Armazenados Localmente</h2>
+    <p>A Extensao utiliza a API <code>chrome.storage.local</code> para salvar as seguintes configuracoes no dispositivo do usuario:</p>
+    <ul>
+      <li>Nomes de grupos monitorados</li>
+      <li>Nomes ou numeros de contatos ignorados</li>
+      <li>Palavras-chave ignoradas</li>
+      <li>Preferencia de monitoramento ativo/inativo</li>
+      <li>Dados de ativacao do plano Pro (email ou chave de licenca)</li>
+    </ul>
+    <p>Esses dados nunca saem do dispositivo do usuario, exceto a verificacao de assinatura descrita abaixo.</p>
+
+    <h2>3. Verificacao de Assinatura (Plano Pro)</h2>
+    <p>Quando o usuario opta pelo plano Pro e informa seu email, a Extensao envia <strong>apenas o email</strong> para nosso servidor (<code>monitor-de-grupos.vercel.app</code>) para verificar o status da assinatura no Mercado Pago. Nenhum outro dado e transmitido.</p>
+    <p>Essa verificacao ocorre:</p>
+    <ul>
+      <li>Quando o usuario ativa o plano Pro manualmente</li>
+      <li>A cada 24 horas para revalidacao automatica</li>
+    </ul>
+
+    <h2>4. Permissoes Utilizadas</h2>
+    <p>A Extensao solicita as seguintes permissoes do Chrome:</p>
+    <ul>
+      <li><strong>storage</strong>: Para salvar configuracoes localmente no navegador</li>
+      <li><strong>tabs</strong>: Para verificar se o WhatsApp Web esta aberto e focar na aba</li>
+      <li><strong>scripting</strong>: Para reinjetar o script de monitoramento quando necessario</li>
+      <li><strong>Host permission (web.whatsapp.com)</strong>: Para ler as notificacoes de mensagens na interface do WhatsApp Web</li>
+    </ul>
+
+    <h2>5. Acesso ao WhatsApp Web</h2>
+    <p>A Extensao acessa a pagina do WhatsApp Web exclusivamente para:</p>
+    <ul>
+      <li>Detectar novas mensagens na barra lateral de conversas</li>
+      <li>Extrair nome do grupo, remetente e texto da mensagem para filtragem</li>
+      <li>Exibir alertas sonoros e visuais conforme configuracao do usuario</li>
+    </ul>
+    <p><strong>Nenhuma mensagem e copiada, armazenada ou enviada para qualquer servidor.</strong></p>
+
+    <h2>6. Compartilhamento de Dados</h2>
+    <p>Nao compartilhamos, vendemos ou transferimos dados de usuarios para terceiros, em nenhuma circunstancia.</p>
+
+    <h2>7. Seguranca</h2>
+    <p>Como todos os dados sao processados e armazenados localmente no navegador, a seguranca dos dados esta vinculada a seguranca do dispositivo do usuario.</p>
+
+    <h2>8. Direitos do Usuario</h2>
+    <p>O usuario pode a qualquer momento:</p>
+    <ul>
+      <li>Visualizar e modificar todas as configuracoes salvas pela Extensao</li>
+      <li>Desativar o plano Pro e remover o email cadastrado</li>
+      <li>Desinstalar a Extensao, o que remove todos os dados locais</li>
+    </ul>
+
+    <h2>9. Alteracoes nesta Politica</h2>
+    <p>Eventuais alteracoes serao publicadas nesta pagina com a data de atualizacao revisada.</p>
+
+    <h2>10. Contato</h2>
+    <p>Para duvidas sobre privacidade, entre em contato pelo email: <a href="mailto:suporte@monitordegruposzap.com">suporte@monitordegruposzap.com</a></p>
+
+    <div class="footer">
+      Monitor de Grupos WhatsApp &mdash; Extensao nao oficial. Sem vinculo com WhatsApp LLC ou Meta.
+    </div>
+  </div>
+</body>
+</html>
