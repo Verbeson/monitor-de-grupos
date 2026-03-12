@@ -501,8 +501,7 @@ export default function App() {
           Extensão não oficial. Sem vínculo com WhatsApp LLC ou Meta.
         </div>
         <div style={{ display: "flex", gap: 20 }}>
-          <a href="#" style={{ fontSize: 12, color: "rgba(232,237,242,0.35)", textDecoration: "none" }}>Privacidade</a>
-          <a href="#" style={{ fontSize: 12, color: "rgba(232,237,242,0.35)", textDecoration: "none" }}>Termos</a>
+          <a href="/monitor-de-grupos/privacy.html" style={{ fontSize: 12, color: "rgba(232,237,242,0.35)", textDecoration: "none" }}>Privacidade</a>
         </div>
       </footer>
     </div>

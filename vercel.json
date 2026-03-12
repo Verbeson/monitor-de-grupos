@@ -1,6 +1,7 @@
 {
-  "buildCommand": "",
+  "buildCommand": "echo skip",
   "outputDirectory": "public",
+  "installCommand": "echo skip",
   "headers": [
     {
       "source": "/api/(.*)",

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor de Grupos - Configuracoes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fff;
+      width: 420px;
+      min-height: 200px;
+      padding: 16px;
+      color: #333;
+    }
+
+    /* Status panel */
+    .status-panel {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .status-panel.conectado { background: #d4efdf; }
+    .status-panel.desconectado { background: #fdedec; }
+    .status-panel.aguardando { background: #fef9e7; }
+    .status-icon { font-size: 20px; margin-right: 10px; }
+    .status-text { font-weight: 600; font-size: 13px; }
+    .status-text.conectado { color: #27ae60; }
+    .status-text.desconectado { color: #e74c3c; }
+    .status-text.aguardando { color: #f39c12; }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .toggle-label { font-weight: 600; font-size: 13px; }
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #ccc;
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle-switch input:checked + .slider { background: #27ae60; }
+    .toggle-switch input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Sections */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+    .section { margin-bottom: 16px; }
+
+    /* List */
+    .item-list {
+      list-style: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      max-height: 100px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+    }
+    .item-list li {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .item-list li:last-child { border-bottom: none; }
+    .item-list li:hover { background: #f7f7f7; }
+    .item-list .empty {
+      color: #999;
+      font-style: italic;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .badge-ativo {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .badge-ativo.on { background: #27ae60; }
+    .badge-ativo.off { background: #e74c3c; }
+
+    /* Input row */
+    .input-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+    }
+    .input-row input:focus { border-color: #3498db; }
+
+    /* Buttons */
+    .btn {
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #fff;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-add { background: #27ae60; }
+    .btn-remove { background: #e74c3c; }
+    .btn-toggle { background: #f39c12; }
+    .btn-small { padding: 4px 8px; font-size: 10px; }
+
+    /* Action buttons row */
+    .action-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    /* Notification toggle */
+    .notif-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-top: 1px solid #eee;
+      margin-top: 8px;
+    }
+    .notif-label { font-size: 12px; color: #666; }
+
+    /* Open whatsapp link */
+    .open-wa {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      padding: 8px;
+      background: #25d366;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    .open-wa:hover { background: #1da851; }
+
+    .separator {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 12px 0;
+    }
+
+    /* Plan badge */
+    .plan-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .plan-badge.free { background: #eee; color: #666; }
+    .plan-badge.pro { background: #f39c12; color: #fff; }
+
+    .limit-msg {
+      font-size: 11px;
+      color: #e67e22;
+      margin-top: 4px;
+      display: none;
+    }
+    .limit-msg a {
+      color: #e67e22;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* Pro section */
+    .pro-section {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .pro-section.active { border-color: #27ae60; background: #d4efdf; }
+    .pro-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pro-status {
+      font-size: 12px;
+      color: #27ae60;
+      font-weight: 600;
+    }
+    .key-row {
+      display: flex;
+      gap: 6px;
+    }
+    .key-row input {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+    }
+    .key-row input:focus { border-color: #3498db; }
+    .btn-activate { background: #f39c12; }
+    .key-error {
+      font-size: 11px;
+      color: #e74c3c;
+      margin-top: 4px;
+      display: none;
+    }
+    .key-success {
+      font-size: 11px;
+      color: #27ae60;
+      margin-top: 4px;
+      display: none;
+    }
+    .upgrade-link {
+      font-size: 11px;
+      color: #3498db;
+      text-decoration: none;
+      display: block;
+      margin-top: 6px;
+    }
+    .upgrade-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <!-- Status -->
+  <div class="status-panel aguardando" id="statusPanel">
+    <span class="status-icon" id="statusIcon">&#x23F3;</span>
+    <span class="status-text aguardando" id="statusText">Verificando...</span>
+    <span class="plan-badge free" id="planBadge" style="margin-left: auto;">FREE</span>
+  </div>
+
+  <!-- Toggle ativo -->
+  <div class="toggle-row">
+    <span class="toggle-label">Monitoramento ativo</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggleAtivo" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Filtros de grupo -->
+  <div class="section">
+    <div class="section-title">Nomes de grupo monitorados:</div>
+    <ul class="item-list" id="grupoList"></ul>
+    <div class="input-row" id="grupoInputRow">
+      <input type="text" id="grupoInput" placeholder="Digite o nome do grupo...">
+      <button class="btn btn-add" id="grupoAddBtn">Adicionar</button>
+    </div>
+    <div class="limit-msg" id="grupoLimit">Limite de 1 grupo no plano Free. <a id="grupoUpgrade">Ativar Pro</a></div>
+  </div>
+
+  <!-- Numeros ignorados -->
+  <div class="section">
+    <div class="section-title">Contatos ignorados (nome ou numero):</div>
+    <ul class="item-list" id="numList"></ul>
+    <div class="input-row" id="numInputRow">
+      <input type="text" id="numInput" placeholder="Ex: Juliana K ou 553191114718">
+      <button class="btn btn-add" id="numAddBtn">Adicionar</button>
+    </div>
+    <div class="limit-msg" id="numLimit">Limite de 1 contato no plano Free. <a id="numUpgrade">Ativar Pro</a></div>
+  </div>
+
+  <!-- Palavras ignoradas -->
+  <div class="section">
+    <div class="section-title">Palavras ignoradas na mensagem:</div>
+    <ul class="item-list" id="palavraList"></ul>
+    <div class="input-row" id="palavraInputRow">
+      <input type="text" id="palavraInput" placeholder="Ex: Alerta de novo incidente">
+      <button class="btn btn-add" id="palavraAddBtn">Adicionar</button>
+    </div>
+    <div class="limit-msg" id="palavraLimit">Limite de 1 palavra no plano Free. <a id="palavraUpgrade">Ativar Pro</a></div>
+  </div>
+
+  <hr class="separator">
+
+  <!-- Ativacao Pro -->
+  <div class="pro-section" id="proSection">
+    <div class="pro-title">
+      <span>Plano Pro</span>
+      <span class="pro-status" id="proStatus" style="display:none;">Ativo</span>
+    </div>
+    <div id="proActivation">
+      <div class="key-row">
+        <input type="text" id="proInput" placeholder="Email da assinatura ou chave de licenca...">
+        <button class="btn btn-activate" id="activateBtn">Ativar</button>
+      </div>
+      <div class="key-error" id="keyError"></div>
+      <div class="key-success" id="keySuccess"></div>
+      <a class="upgrade-link" href="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=df6fffef0b634a13b94f51ed1fbf4199" target="_blank">Assinar plano Pro</a>
+    </div>
+    <div id="proActive" style="display:none;">
+      <div style="font-size:12px; color:#27ae60; margin-bottom:6px;" id="proInfo">Todas as funcionalidades desbloqueadas.</div>
+      <div style="font-size:11px; color:#666; margin-bottom:6px;" id="proEmailDisplay"></div>
+      <button class="btn btn-remove btn-small" id="deactivateBtn">Desconectar</button>
+    </div>
+  </div>
+
+  <!-- Abrir WhatsApp -->
+  <button class="open-wa" id="openWA">Abrir WhatsApp Web</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
