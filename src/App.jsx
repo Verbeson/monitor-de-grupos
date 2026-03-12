@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 
 const MP_SUBSCRIBE_URL = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=df6fffef0b634a13b94f51ed1fbf4199";
 
+// Substitua pelo link da Chrome Web Store apos publicar
+const CHROME_STORE_URL = "https://chrome.google.com/webstore/detail/EXTENSION_ID_AQUI";
+
 const PLANS = [
   {
     name: "Free",
@@ -262,8 +265,8 @@ export default function App() {
           <a href="#precos">Preços</a>
           <a href="#faq">FAQ</a>
         </div>
-        <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ padding: "10px 24px", fontSize: 12, textDecoration: "none" }}>
-          Baixar grátis
+        <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: "10px 24px", fontSize: 12, textDecoration: "none" }}>
+          Adicionar ao Chrome
         </a>
       </nav>
 
@@ -300,7 +303,7 @@ export default function App() {
             Só o que você definiu chega até você.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ textDecoration: "none" }}>Baixar extensão grátis</a>
+            <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ textDecoration: "none" }}>Adicionar ao Chrome — grátis</a>
             <a href="#precos" className="btn-ghost" style={{ textDecoration: "none" }}>Ver planos</a>
           </div>
           <p style={{ marginTop: 20, fontSize: 12, color: "rgba(232,237,242,0.3)", letterSpacing: "0.05em" }}>
@@ -431,7 +434,7 @@ export default function App() {
                       {plan.cta}
                     </a>
                   ) : (
-                    <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-ghost" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
+                    <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
                       {plan.cta}
                     </a>
                   )}
@@ -482,8 +485,8 @@ export default function App() {
             <p style={{ color: "rgba(232,237,242,0.45)", fontSize: 15, marginBottom: 36 }}>
               Instale grátis e configure em menos de 2 minutos.
             </p>
-            <a href={`${import.meta.env.BASE_URL}MonitorDeGrupos-Extension.zip`} download className="btn-primary" style={{ fontSize: 14, padding: "16px 40px", textDecoration: "none", display: "inline-block" }}>
-              Baixar extensão — grátis
+            <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: 14, padding: "16px 40px", textDecoration: "none", display: "inline-block" }}>
+              Adicionar ao Chrome — grátis
             </a>
           </div>
         </FadeIn>
