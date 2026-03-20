@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
           chrome.storage.local.set({ proEmail: email, proActive: false, proStatus: "paused" });
           updatePlanUI("paused");
         } else {
-          keyError.textContent = data?.message || "Nenhuma assinatura encontrada para este email.";
+          keyError.textContent = "Nenhuma assinatura encontrada. Use o email da sua conta Mercado Pago (o mesmo usado no pagamento).";
           keyError.style.display = "";
           chrome.storage.local.set({ proEmail: email, proActive: false, proStatus: "none" });
         }

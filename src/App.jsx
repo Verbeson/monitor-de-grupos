@@ -429,9 +429,14 @@ export default function App() {
                     ))}
                   </ul>
                   {plan.link ? (
-                    <a href={plan.link} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
-                      {plan.cta}
-                    </a>
+                    <>
+                      <a href={plan.link} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
+                        {plan.cta}
+                      </a>
+                      <p style={{ marginTop: 12, fontSize: 11, color: "rgba(232,237,242,0.35)", textAlign: "center", lineHeight: 1.5 }}>
+                        Ative na extensão usando o email da sua conta Mercado Pago
+                      </p>
+                    </>
                   ) : (
                     <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ width: "100%", display: "block", textAlign: "center", textDecoration: "none" }}>
                       {plan.cta}
