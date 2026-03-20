@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 const MP_SUBSCRIBE_URL = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=df6fffef0b634a13b94f51ed1fbf4199";
 
-// Substitua pelo link da Chrome Web Store apos publicar
-const CHROME_STORE_URL = "https://chrome.google.com/webstore/detail/EXTENSION_ID_AQUI";
+const CHROME_STORE_URL = "https://chromewebstore.google.com/detail/monitor-de-grupos-whatsap/jooceejghfhicolagfhjmmiiodnpoeff";
 
 const PLANS = [
   {
