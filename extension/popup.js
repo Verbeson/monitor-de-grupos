@@ -48,31 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPro = false;
   let proMethod = ""; // "email" ou "key"
 
-  // Validar chave de licenca MGP-AAMM-XXXX-XXXX
-  function validateKey(key) {
-    key = key.trim().toUpperCase();
-    var parts = key.split("-");
-    if (parts.length !== 4 || parts[0] !== "MGP") return { valid: false, reason: "Formato invalido. Use MGP-AAMM-XXXX-XXXX." };
-    if (!/^\d{4}$/.test(parts[1])) return { valid: false, reason: "Bloco de data invalido." };
-    if (!/^[A-Z0-9]{4}$/.test(parts[2]) || !/^[A-Z0-9]{4}$/.test(parts[3])) return { valid: false, reason: "Blocos de chave invalidos." };
-
-    // Checksum: soma dos charCodes dos blocos aleatorios (3+4) divisivel por 7
-    var checkStr = parts[2] + parts[3];
-    var sum = 0;
-    for (var c = 0; c < checkStr.length; c++) sum += checkStr.charCodeAt(c);
-    if (sum % 7 !== 0) return { valid: false, reason: "Chave de licenca invalida." };
-
-    // Verificar validade (AAMM)
-    var yy = parseInt(parts[1].substring(0, 2), 10);
-    var mm = parseInt(parts[1].substring(2, 4), 10);
-    if (mm < 1 || mm > 12) return { valid: false, reason: "Mes invalido na chave." };
-    var expYear = 2000 + yy;
-    var expMonth = mm;
-    var now = new Date();
-    var expDate = new Date(expYear, expMonth, 0, 23, 59, 59); // ultimo dia do mes
-    if (now > expDate) return { valid: false, reason: "Chave expirada em " + String(mm).padStart(2, "0") + "/" + expYear + "." };
-
-    return { valid: true, expiry: String(mm).padStart(2, "0") + "/" + expYear };
+  // Validar chave de licenca no servidor
+  function validateKeyServer(key, callback) {
+    fetch(API_URL + "/api/validate-key", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: key.trim().toUpperCase() }),
+    })
+      .then((res) => res.json())
+      .then((data) => callback(null, data))
+      .catch((err) => callback(err, null));
   }
 
   // Verificar assinatura na API
@@ -95,15 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
         proMethod = data.proMethod || "";
         if (data.proActive) {
           if (proMethod === "key" && data.proKey) {
-            // Revalidar chave (pode ter expirado)
-            var result = validateKey(data.proKey);
-            if (result.valid) {
-              isPro = true;
-              proInput.value = data.proKey;
-            } else {
-              isPro = false;
-              chrome.storage.local.set({ proActive: false, proStatus: "expired" });
-              proInput.value = data.proKey;
+            // Manter ativo por cache local, revalidar no servidor a cada 24h
+            isPro = true;
+            proInput.value = data.proKey;
+            var now = Date.now();
+            if (now - data.proLastCheck > CHECK_INTERVAL_MS) {
+              revalidateKey(data.proKey);
             }
           } else if (data.proEmail) {
             isPro = true;
@@ -121,6 +103,29 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePlanUI(data.proStatus || "");
       }
     );
+  }
+
+  // Revalidar chave de licenca no servidor
+  function revalidateKey(key) {
+    validateKeyServer(key, (err, data) => {
+      if (err) return; // Se falhar, manter estado atual
+      if (data && data.valid) {
+        isPro = true;
+        chrome.storage.local.set({
+          proActive: true,
+          proLastCheck: Date.now(),
+          proStatus: "active",
+        });
+      } else {
+        isPro = false;
+        chrome.storage.local.set({
+          proActive: false,
+          proLastCheck: Date.now(),
+          proStatus: data ? "invalid" : "none",
+        });
+        updatePlanUI(data ? "invalid" : "none");
+      }
+    });
   }
 
   // Revalidar assinatura silenciosamente
@@ -229,25 +234,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Detectar se e chave (MGP-...) ou email (contem @)
     if (val.toUpperCase().startsWith("MGP-")) {
-      // Validacao por chave de licenca
-      var result = validateKey(val);
-      if (result.valid) {
-        isPro = true;
-        proMethod = "key";
-        chrome.storage.local.set({
-          proKey: val.toUpperCase(),
-          proMethod: "key",
-          proActive: true,
-          proLastCheck: Date.now(),
-          proStatus: "active",
-        });
-        keySuccess.textContent = "Chave valida! Pro ativo ate " + result.expiry + ".";
-        keySuccess.style.display = "";
-        updatePlanUI("active");
-      } else {
-        keyError.textContent = result.reason;
-        keyError.style.display = "";
-      }
+      // Validacao por chave de licenca no servidor
+      activateBtn.textContent = "Verificando...";
+      activateBtn.disabled = true;
+
+      validateKeyServer(val, (err, data) => {
+        activateBtn.textContent = "Ativar";
+        activateBtn.disabled = false;
+
+        if (err) {
+          keyError.textContent = "Erro ao verificar. Tente novamente.";
+          keyError.style.display = "";
+          return;
+        }
+
+        if (data && data.valid) {
+          isPro = true;
+          proMethod = "key";
+          chrome.storage.local.set({
+            proKey: val.toUpperCase(),
+            proMethod: "key",
+            proActive: true,
+            proLastCheck: Date.now(),
+            proStatus: "active",
+          });
+          keySuccess.textContent = "Chave valida! Pro ativo ate " + data.expiry + ".";
+          keySuccess.style.display = "";
+          updatePlanUI("active");
+        } else {
+          keyError.textContent = (data && data.reason) || "Chave de licenca invalida.";
+          keyError.style.display = "";
+        }
+      });
     } else if (val.includes("@")) {
       // Validacao por email (Mercado Pago)
       var email = val.toLowerCase();

@@ -9,7 +9,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://web.whatsapp.com/*"
+    "https://web.whatsapp.com/*",
+    "https://monitor-de-grupos.vercel.app/*"
   ],
   "background": {
     "service_worker": "background.js"
