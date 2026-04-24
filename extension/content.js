@@ -15,6 +15,8 @@
   var processedMessages = new Set();
   var scanTimeout = null;
   var isScanning = false;
+  var pendingAlerts = [];
+  var isSendingAlert = false;
 
   function loadConfig() {
     chrome.storage.local.get(
@@ -29,6 +31,19 @@
 
   chrome.storage.onChanged.addListener(function (changes, area) {
     if (area === "local") loadConfig();
+  });
+
+  chrome.runtime.onMessage.addListener(function (message) {
+    if (message.type === "CLICK_GROUP" && message.grupo) {
+      var chatContainers = document.querySelectorAll("._ak72, [data-testid='cell-frame-container'], [role='listitem']");
+      for (var i = 0; i < chatContainers.length; i++) {
+        var nameEl = chatContainers[i].querySelector("._ak8q span[title]");
+        if (nameEl && nameEl.getAttribute("title") === message.grupo) {
+          chatContainers[i].querySelector("._ak8k, [data-testid='cell-frame-container']").click();
+          break;
+        }
+      }
+    }
   });
 
   // Extrai apenas digitos de uma string (para comparar numeros de telefone)
@@ -238,20 +253,11 @@
         msgText = msgText.substring(0, 200) + "...";
       }
 
-      try {
-        chrome.runtime.sendMessage({
-          type: "NEW_MESSAGE",
-          data: {
-            grupo: chatName,
-            remetente: sender || "Desconhecido",
-            mensagem: msgText,
-          },
-        });
-      } catch (e) {
-        window.__monitorGruposAtivo = false;
-        isScanning = false;
-        return;
-      }
+      pendingAlerts.push({
+        grupo: chatName,
+        remetente: sender || "Desconhecido",
+        mensagem: msgText,
+      });
     }
 
     // Limitar tamanho do Set de mensagens processadas
@@ -261,6 +267,24 @@
     }
 
     isScanning = false;
+    flushAlerts();
+  }
+
+  function flushAlerts() {
+    if (isSendingAlert || pendingAlerts.length === 0) return;
+    isSendingAlert = true;
+    var alert = pendingAlerts.shift();
+    try {
+      chrome.runtime.sendMessage({ type: "NEW_MESSAGE", data: alert }, function () {
+        isSendingAlert = false;
+        if (pendingAlerts.length > 0) {
+          setTimeout(flushAlerts, 500);
+        }
+      });
+    } catch (e) {
+      window.__monitorGruposAtivo = false;
+      isSendingAlert = false;
+    }
   }
 
   function scheduleScan() {

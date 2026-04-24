@@ -190,6 +190,27 @@
       margin: 12px 0;
     }
 
+    /* Timer input */
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timer-input {
+      width: 70px;
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+      text-align: center;
+    }
+    .timer-input:focus { border-color: #3498db; }
+    .timer-hint {
+      font-size: 11px;
+      color: #999;
+    }
+
     /* Plan badge */
     .plan-badge {
       font-size: 10px;
@@ -346,6 +367,17 @@
       <button class="btn btn-remove btn-small" id="deactivateBtn">Desconectar</button>
     </div>
   </div>
+
+  <!-- Timer de auto-fechamento -->
+  <div class="section">
+    <div class="section-title">Fechar alerta automaticamente:</div>
+    <div class="timer-row">
+      <input type="number" id="autoCloseTimer" class="timer-input" min="0" max="300" step="1" value="0" placeholder="0">
+      <span class="timer-hint">segundos (0 = manual)</span>
+    </div>
+  </div>
+
+  <hr class="separator">
 
   <!-- Abrir WhatsApp -->
   <button class="open-wa" id="openWA">Abrir WhatsApp Web</button>

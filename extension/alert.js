@@ -1,12 +1,40 @@
 // Alert popup - Exibe alerta de nova mensagem
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.local.get("lastAlert", (data) => {
+  var alertGrupo = "";
+
+  chrome.storage.local.get(["lastAlert", "autoCloseSeconds"], (data) => {
     if (data.lastAlert) {
+      alertGrupo = data.lastAlert.grupo || "";
       document.getElementById("grupo").textContent = data.lastAlert.grupo;
       document.getElementById("remetente").textContent = data.lastAlert.remetente;
       document.getElementById("mensagem").textContent = data.lastAlert.mensagem;
       chrome.storage.local.remove("lastAlert");
     }
+
+    // Auto-fechamento configuravel
+    var seconds = data.autoCloseSeconds || 0;
+    if (seconds > 0) {
+      var remaining = seconds;
+      var btnOk = document.getElementById("btnOk");
+      btnOk.textContent = "OK (" + remaining + "s)";
+
+      var countdown = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(countdown);
+          window.close();
+        } else {
+          btnOk.textContent = "OK (" + remaining + "s)";
+        }
+      }, 1000);
+    }
+  });
+
+  document.getElementById("btnOpen").addEventListener("click", () => {
+    if (alertGrupo) {
+      chrome.runtime.sendMessage({ type: "OPEN_GROUP", grupo: alertGrupo });
+    }
+    window.close();
   });
 
   document.getElementById("btnOk").addEventListener("click", () => {

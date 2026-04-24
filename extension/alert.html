@@ -60,22 +60,34 @@
       min-height: 55px;
       max-height: 80px;
     }
-    .btn-ok {
-      display: block;
-      margin: 14px auto 0;
-      width: 120px;
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .btn-ok, .btn-open {
+      width: 130px;
       height: 38px;
-      background: #27ae60;
       color: #fff;
       border: none;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.2s;
     }
+    .btn-ok {
+      background: #27ae60;
+    }
     .btn-ok:hover {
       background: #219a52;
+    }
+    .btn-open {
+      background: #3498db;
+    }
+    .btn-open:hover {
+      background: #2980b9;
     }
   </style>
 </head>
@@ -92,7 +104,10 @@
       <span class="info-label"><strong>Remetente:</strong> <span id="remetente"></span></span>
     </div>
     <div class="msg-box" id="mensagem"></div>
-    <button class="btn-ok" id="btnOk">OK</button>
+    <div class="btn-row">
+      <button class="btn-open" id="btnOpen">Ver mensagem</button>
+      <button class="btn-ok" id="btnOk">OK</button>
+    </div>
   </div>
   <script src="alert.js"></script>
 </body>

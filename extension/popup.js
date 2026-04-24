@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const proEmailDisplay = document.getElementById("proEmailDisplay");
   const deactivateBtn = document.getElementById("deactivateBtn");
 
+  const autoCloseTimer = document.getElementById("autoCloseTimer");
+
   const API_URL = "https://monitor-de-grupos.vercel.app";
 
   const FREE_LIMIT = 1;
@@ -546,6 +548,18 @@ document.addEventListener("DOMContentLoaded", () => {
     div.textContent = text;
     return div.innerHTML;
   }
+
+  // Timer de auto-fechamento
+  chrome.storage.local.get({ autoCloseSeconds: 0 }, (data) => {
+    autoCloseTimer.value = data.autoCloseSeconds || 0;
+  });
+
+  autoCloseTimer.addEventListener("input", () => {
+    var val = parseInt(autoCloseTimer.value, 10);
+    if (isNaN(val) || val < 0) val = 0;
+    if (val > 300) val = 300;
+    chrome.storage.local.set({ autoCloseSeconds: val });
+  });
 
   // Inicializar
   loadPlan();

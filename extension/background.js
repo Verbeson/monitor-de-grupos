@@ -2,14 +2,18 @@
 
 let connectionStatus = "aguardando";
 let alertWindowId = null;
+let isCreatingWindow = false;
+let alertQueue = [];
 
 // Receber mensagens do content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "NEW_MESSAGE") {
-    showAlertPopup(message.data);
+    enqueueAlert(message.data);
   } else if (message.type === "STATUS_UPDATE") {
     connectionStatus = message.status;
     updateBadge(message.status);
+  } else if (message.type === "OPEN_GROUP") {
+    openGroupInWhatsApp(message.grupo);
   }
 });
 
@@ -25,41 +29,50 @@ function updateBadge(status) {
   chrome.action.setBadgeBackgroundColor({ color: badge.color });
 }
 
-// Mostrar popup de alerta - reutiliza janela existente se possivel
-function showAlertPopup(data) {
-  // Salvar dados da mensagem para o alert.html ler
-  chrome.storage.local.set({
-    lastAlert: {
-      grupo: data.grupo,
-      remetente: data.remetente,
-      mensagem: data.mensagem,
-      timestamp: Date.now(),
-    },
+function enqueueAlert(data) {
+  alertQueue.push({
+    grupo: data.grupo,
+    remetente: data.remetente,
+    mensagem: data.mensagem,
+    timestamp: Date.now(),
   });
+  processQueue();
+}
 
-  // Verificar se ja existe uma janela de alerta aberta
-  if (alertWindowId !== null) {
-    chrome.windows.get(alertWindowId, (win) => {
-      if (chrome.runtime.lastError || !win) {
-        // Janela nao existe mais, criar nova
-        alertWindowId = null;
-        createAlertWindow();
-      } else {
-        // Reutilizar janela existente: recarregar e focar
-        chrome.tabs.query({ windowId: alertWindowId }, (tabs) => {
-          if (tabs && tabs.length > 0) {
-            chrome.tabs.reload(tabs[0].id);
-          }
-          chrome.windows.update(alertWindowId, { focused: true, drawAttention: true });
-        });
-      }
-    });
-  } else {
-    createAlertWindow();
-  }
+function processQueue() {
+  if (alertQueue.length === 0 || isCreatingWindow) return;
+
+  const alertData = alertQueue.shift();
+
+  chrome.storage.local.set({ lastAlert: alertData }, () => {
+    if (alertWindowId !== null) {
+      chrome.windows.get(alertWindowId, (win) => {
+        if (chrome.runtime.lastError || !win) {
+          alertWindowId = null;
+          createAlertWindow();
+        } else {
+          chrome.tabs.query({ windowId: alertWindowId }, (tabs) => {
+            if (tabs && tabs.length > 0) {
+              chrome.tabs.reload(tabs[0].id, () => {
+                chrome.windows.update(alertWindowId, { focused: true, drawAttention: true });
+                processQueue();
+              });
+            } else {
+              processQueue();
+            }
+          });
+        }
+      });
+    } else {
+      createAlertWindow();
+    }
+  });
 }
 
 function createAlertWindow() {
+  if (isCreatingWindow) return;
+  isCreatingWindow = true;
+
   const popupW = 480;
   const popupH = 300;
 
@@ -84,16 +97,31 @@ function createAlertWindow() {
       left: left,
       top: top,
     }, (popupWindow) => {
+      isCreatingWindow = false;
       if (chrome.runtime.lastError) {
         console.error("[Monitor] Erro ao criar popup:", chrome.runtime.lastError.message);
         alertWindowId = null;
+        processQueue();
         return;
       }
       if (popupWindow) {
         alertWindowId = popupWindow.id;
         chrome.windows.update(popupWindow.id, { focused: true, drawAttention: true });
       }
+      processQueue();
     });
+  });
+}
+
+// Abrir grupo no WhatsApp Web
+function openGroupInWhatsApp(groupName) {
+  chrome.tabs.query({ url: "https://web.whatsapp.com/*" }, (tabs) => {
+    if (tabs.length > 0) {
+      const tab = tabs[0];
+      chrome.tabs.update(tab.id, { active: true });
+      chrome.windows.update(tab.windowId, { focused: true });
+      chrome.tabs.sendMessage(tab.id, { type: "CLICK_GROUP", grupo: groupName });
+    }
   });
 }
 
