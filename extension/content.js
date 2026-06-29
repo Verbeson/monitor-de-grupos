@@ -33,20 +33,73 @@
     if (area === "local") loadConfig();
   });
 
+  // Seletores resilientes - usa atributos estaveis em vez de classes ofuscadas
+  function getChatContainers() {
+    var items = document.querySelectorAll('[data-testid="cell-frame-container"]');
+    if (items.length > 0) return items;
+    var pane = document.querySelector("#pane-side");
+    if (pane) {
+      items = pane.querySelectorAll('[role="listitem"]');
+      if (items.length > 0) return items;
+    }
+    items = document.querySelectorAll('[role="listitem"]');
+    if (items.length > 0) return items;
+    return document.querySelectorAll(".__empty_fallback__");
+  }
+
+  function getTopLevelTitleSpans(container) {
+    var all = container.querySelectorAll("span[title]");
+    var result = [];
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var parent = el.parentElement;
+      var nested = false;
+      while (parent && parent !== container) {
+        if (parent.tagName === "SPAN" && parent.hasAttribute("title")) {
+          nested = true;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+      if (!nested) result.push(el);
+    }
+    return result;
+  }
+
+  function getGroupNameSpan(container) {
+    var spans = getTopLevelTitleSpans(container);
+    return spans.length > 0 ? spans[0] : null;
+  }
+
+  function getPreviewSpan(container) {
+    var spans = getTopLevelTitleSpans(container);
+    return spans.length > 1 ? spans[1] : null;
+  }
+
+  function getTimestampText(container) {
+    var spans = container.querySelectorAll("span");
+    for (var i = 0; i < spans.length; i++) {
+      var text = spans[i].textContent.trim();
+      if (/^\d{1,2}:\d{2}$/.test(text) && !spans[i].hasAttribute("title")) {
+        return text;
+      }
+    }
+    return "";
+  }
+
   chrome.runtime.onMessage.addListener(function (message) {
     if (message.type === "CLICK_GROUP" && message.grupo) {
-      var chatContainers = document.querySelectorAll("._ak72, [data-testid='cell-frame-container'], [role='listitem']");
-      for (var i = 0; i < chatContainers.length; i++) {
-        var nameEl = chatContainers[i].querySelector("._ak8q span[title]");
-        if (nameEl && nameEl.getAttribute("title") === message.grupo) {
-          chatContainers[i].querySelector("._ak8k, [data-testid='cell-frame-container']").click();
+      var containers = getChatContainers();
+      for (var i = 0; i < containers.length; i++) {
+        var nameSpan = getGroupNameSpan(containers[i]);
+        if (nameSpan && nameSpan.getAttribute("title") === message.grupo) {
+          containers[i].click();
           break;
         }
       }
     }
   });
 
-  // Extrai apenas digitos de uma string (para comparar numeros de telefone)
   function onlyDigits(str) {
     return str.replace(/\D/g, "");
   }
@@ -62,18 +115,14 @@
       var valorUpper = valor.toUpperCase().trim();
       var valorDigits = onlyDigits(valor);
 
-      // Comparacao por nome (exata, case-insensitive)
       if (senderUpper === valorUpper) {
         return true;
       }
 
-      // Comparacao por numero de telefone (so digitos, ignora formatacao)
       if (valorDigits.length >= 8 && senderDigits.length >= 8) {
-        // Checar se um termina com o outro (ignora codigo de pais)
         if (senderDigits.endsWith(valorDigits) || valorDigits.endsWith(senderDigits)) {
           return true;
         }
-        // Igualdade exata dos digitos
         if (senderDigits === valorDigits) {
           return true;
         }
@@ -102,25 +151,21 @@
   function cleanSenderName(text) {
     if (!text) return "";
     return text
-      .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
+      .replace(/[‎‏‪-‮]/g, "")
       .replace(/^~\s*/, "")
       .replace(/^Talvez\s+/i, "")
       .replace(/:$/, "")
       .trim();
   }
 
-  // Verifica se o timestamp indica mensagem de hoje (formato HH:MM)
   function isTodayTimestamp(timeText) {
     if (!timeText) return false;
-    timeText = timeText.trim();
-    if (/^\d{1,2}:\d{2}$/.test(timeText)) return true;
-    return false;
+    return /^\d{1,2}:\d{2}$/.test(timeText.trim());
   }
 
   function scanSidebar() {
     if (!config.ativo || isScanning) return;
 
-    // Verificar se o contexto da extensao ainda e valido
     try {
       chrome.runtime.getURL("");
     } catch (e) {
@@ -130,55 +175,30 @@
 
     isScanning = true;
 
-    var chatItems = document.querySelectorAll("._ak8k");
+    var chatContainers = getChatContainers();
 
-    for (var i = 0; i < chatItems.length; i++) {
-      var item = chatItems[i];
+    for (var i = 0; i < chatContainers.length; i++) {
+      var container = chatContainers[i];
 
-      // Primeiro checar o title do preview para rejeitar rapido ja processados
-      var previewSpan = item.querySelector("span[title].x78zum5");
+      var previewSpan = getPreviewSpan(container);
       if (!previewSpan) continue;
 
       var fullPreview = previewSpan.getAttribute("title") || "";
       if (!fullPreview) continue;
 
-      // Subir ao container raiz do chat (._ak72)
-      var chatContainer = item.closest("._ak72") ||
-                          item.closest('[data-testid="cell-frame-container"]') ||
-                          item.closest('[role="listitem"]') ||
-                          item.parentElement.parentElement.parentElement;
-
-      if (!chatContainer) continue;
-
-      // Nome do grupo: span[title] dentro de ._ak8q
-      var groupNameEl = chatContainer.querySelector("._ak8q span[title]");
-      if (!groupNameEl) {
-        var allTitleSpans = chatContainer.querySelectorAll("span[title][dir='auto']");
-        for (var t = 0; t < allTitleSpans.length; t++) {
-          var candidate = allTitleSpans[t];
-          if (candidate !== previewSpan && candidate.getAttribute("title") !== fullPreview) {
-            groupNameEl = candidate;
-            break;
-          }
-        }
-      }
-
+      var groupNameEl = getGroupNameSpan(container);
       if (!groupNameEl) continue;
+
       var chatName = groupNameEl.getAttribute("title");
       if (!chatName) continue;
 
-      // Rejeitar rapido: filtro de grupo e msgId antes de processar mais
       if (!matchesGroupFilter(chatName)) continue;
 
       var msgId = chatName + "|" + fullPreview;
       if (processedMessages.has(msgId)) continue;
 
-      // Verificar timestamp: so processar mensagens de hoje (HH:MM)
-      var timeCell = chatContainer.querySelector("._ak8o ._ak8i span") ||
-                     chatContainer.querySelector("._ak8o ._ak8i");
-      var timeText = timeCell ? timeCell.textContent.trim() : "";
+      var timeText = getTimestampText(container);
       if (!isTodayTimestamp(timeText)) {
-        // Marcar como processado para nao verificar novamente
         processedMessages.add(msgId);
         continue;
       }
@@ -186,7 +206,7 @@
       var sender = "";
       var msgText = "";
 
-      // 1) Remetente via span[aria-label] dentro do preview (mais confiavel)
+      // 1) Remetente via span[aria-label] dentro do preview
       var senderByLabel = previewSpan.querySelector("span[aria-label]");
       if (senderByLabel) {
         var label = senderByLabel.getAttribute("aria-label") || "";
@@ -195,17 +215,23 @@
         }
       }
 
-      // 2) Fallback: span com dir="auto" e _ao3e (remetente em grupo)
+      // 2) Fallback: span com dir="auto" que parece nome de remetente
       if (!sender) {
-        var senderAo3e = previewSpan.querySelector('span[dir="auto"]._ao3e');
-        if (senderAo3e && !senderAo3e.querySelector("img")) {
-          sender = cleanSenderName(senderAo3e.textContent);
+        var childSpans = previewSpan.querySelectorAll('span[dir="auto"]');
+        for (var d = 0; d < childSpans.length; d++) {
+          var cs = childSpans[d];
+          if (cs.hasAttribute("title") || cs.querySelector("img")) continue;
+          var csText = cs.textContent.trim();
+          if (csText.length > 0 && csText.length < 50) {
+            sender = cleanSenderName(csText);
+            break;
+          }
         }
       }
 
       // 3) Fallback: extrair do title (formato "Remetente: mensagem")
       if (!sender) {
-        var cleanPreview = fullPreview.replace(/[\u200e\u200f\u202a-\u202e]/g, "");
+        var cleanPreview = fullPreview.replace(/[‎‏‪-‮]/g, "");
         var colonIdx = cleanPreview.indexOf(":");
         if (colonIdx > 0 && colonIdx < 50) {
           var possibleSender = cleanPreview.substring(0, colonIdx).trim();
@@ -228,7 +254,7 @@
 
       // Fallback: extrair mensagem do atributo title
       if (!msgText) {
-        var fullText = fullPreview.replace(/[\u200e\u200f\u202a-\u202e]/g, "");
+        var fullText = fullPreview.replace(/[‎‏‪-‮]/g, "");
         if (sender && fullText.includes(sender)) {
           var afterSender = fullText.indexOf(sender) + sender.length;
           msgText = fullText.substring(afterSender).replace(/^[:\s~]+/, "").trim();
@@ -237,8 +263,7 @@
         }
       }
 
-      // Limpar caracteres invisiveis e validar conteudo real
-      msgText = msgText.replace(/[\u200e\u200f\u202a-\u202e\u200b\u00a0]/g, " ").trim();
+      msgText = msgText.replace(/[‎‏‪-‮​ ]/g, " ").trim();
       if (!msgText || msgText.length < 2) {
         processedMessages.add(msgId);
         continue;
@@ -260,7 +285,6 @@
       });
     }
 
-    // Limitar tamanho do Set de mensagens processadas
     if (processedMessages.size > 500) {
       var arr = Array.from(processedMessages);
       processedMessages = new Set(arr.slice(arr.length - 250));
@@ -289,24 +313,17 @@
 
   function scheduleScan() {
     if (scanTimeout) clearTimeout(scanTimeout);
-    // Debounce de 2 segundos para agrupar multiplas mutations
     scanTimeout = setTimeout(scanSidebar, 2000);
   }
 
   function startObserver() {
-    // Tentar observar o container mais restrito possivel
     var target = document.querySelector("#pane-side") ||
                  document.querySelector('[aria-label*="lista"]') ||
-                 document.querySelector("._ak8l");
+                 document.querySelector("#app");
 
-    // Se nao achou container restrito, observar #app mas so atributos
-    if (!target) {
-      target = document.querySelector("#app");
-    }
     if (!target) return false;
 
     var observer = new MutationObserver(function (mutations) {
-      // So reagir se houve mudanca em atributo title (preview mudou)
       var relevant = false;
       for (var m = 0; m < mutations.length; m++) {
         var mut = mutations[m];
@@ -335,38 +352,59 @@
   function init() {
     var checkInterval = setInterval(function () {
       var app = document.querySelector("#app");
-      var hasChatItems = app && app.querySelectorAll("._ak8k").length > 0;
-      if (app && hasChatItems) {
-        clearInterval(checkInterval);
+      if (!app) return;
 
-        chrome.runtime.sendMessage({ type: "STATUS_UPDATE", status: "conectado" });
+      var containers = getChatContainers();
+      if (containers.length === 0) return;
 
-        // Marcar previews atuais como ja processados
-        var chatItems = document.querySelectorAll("._ak8k");
-        for (var i = 0; i < chatItems.length; i++) {
-          var previewSpan = chatItems[i].querySelector("span[title].x78zum5");
-          if (!previewSpan) continue;
-          var preview = previewSpan.getAttribute("title") || "";
-          if (!preview) continue;
-          var container = chatItems[i].closest("._ak72") ||
-                          chatItems[i].parentElement.parentElement.parentElement;
-          if (!container) continue;
-          var groupEl = container.querySelector("._ak8q span[title]");
-          if (groupEl) {
-            processedMessages.add(groupEl.getAttribute("title") + "|" + preview);
-          }
+      clearInterval(checkInterval);
+
+      chrome.runtime.sendMessage({ type: "STATUS_UPDATE", status: "conectado" });
+
+      for (var i = 0; i < containers.length; i++) {
+        var previewSpan = getPreviewSpan(containers[i]);
+        if (!previewSpan) continue;
+        var preview = previewSpan.getAttribute("title") || "";
+        if (!preview) continue;
+        var groupEl = getGroupNameSpan(containers[i]);
+        if (groupEl) {
+          processedMessages.add(groupEl.getAttribute("title") + "|" + preview);
         }
-
-        startObserver();
-
-        // Scan periodico como fallback para abas em background
-        // O Chrome throttle timers em background para ~1min, mas garante que funcione
-        setInterval(function () {
-          if (config.ativo) scanSidebar();
-        }, 10000);
       }
+
+      startObserver();
+
+      setInterval(function () {
+        if (config.ativo) scanSidebar();
+      }, 10000);
     }, 2000);
   }
+
+  // Diagnostico acessivel via console: window.__monitorDiagnostico()
+  window.__monitorDiagnostico = function () {
+    var pane = document.querySelector("#pane-side");
+    console.log("=== Monitor de Grupos - Diagnostico ===");
+    console.log("#pane-side:", pane ? "ENCONTRADO" : "NAO ENCONTRADO");
+    console.log("#app:", document.querySelector("#app") ? "ENCONTRADO" : "NAO ENCONTRADO");
+
+    var containers = getChatContainers();
+    console.log("Chat containers encontrados:", containers.length);
+
+    if (containers.length > 0) {
+      var first = containers[0];
+      var spans = getTopLevelTitleSpans(first);
+      console.log("Primeiro container - span[title] encontrados:", spans.length);
+      for (var j = 0; j < Math.min(spans.length, 5); j++) {
+        console.log("  span[" + j + "]:", spans[j].getAttribute("title"));
+      }
+      console.log("Timestamp:", getTimestampText(first));
+    }
+
+    console.log("Config:", JSON.stringify(config));
+    console.log("Ativo:", config.ativo);
+    console.log("Mensagens processadas:", processedMessages.size);
+    console.log("=======================================");
+  };
 
   if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(init, 1000);
